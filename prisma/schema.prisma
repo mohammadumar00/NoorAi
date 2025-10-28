@@ -1,0 +1,50 @@
+// prisma/schema.prisma
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+model Surah {
+    id          Int    @id @default(autoincrement())
+    number      Int    @unique
+    name        String // Arabic name of the Surah
+    englishName String // English name of Surah
+    totalAyah   Int
+    ayahs       Ayah[]
+}
+
+model Ayah {
+    id            Int           @id @default(autoincrement())
+    surahId       Int
+    numberInSurah Int // Verse number within Surah
+    arabicText    String
+    translations  Translation[]
+    tafsir        Tafsir?       @relation
+    tafsirId      Int?
+    surah         Surah         @relation(fields: [surahId], references: [id])
+
+    @@unique([surahId, numberInSurah]) // Ensure unique ayah per surah
+}
+
+model Translation {
+    id       Int    @id @default(autoincrement())
+    ayahId   Int
+    language String // e.g., 'en' for English, 'ur' for Urdu
+    text     String
+    ayah     Ayah   @relation(fields: [ayahId], references: [id])
+
+    @@unique([ayahId, language]) // One translation per language per ayah
+}
+
+model Tafsir {
+    id     Int    @id @default(autoincrement())
+    ayahId Int    @unique
+    text   String
+    source String
+    ayah   Ayah   @relation(fields: [ayahId], references: [id])
+}
