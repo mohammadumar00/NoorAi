@@ -22,7 +22,7 @@ model Ayah {
     id            Int           @id @default(autoincrement())
     surahId       Int
     numberInSurah Int // Verse number within Surah
-    embedding     Bytes?
+    embedding     Float[]
     arabicText    String
     audioUrl      String
     translations  Translation[]
